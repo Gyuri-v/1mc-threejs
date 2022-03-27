@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+// 주제 : 기본 장면
+
 export default function example() {
   // 동적으로 캔버스 조립하기
 
