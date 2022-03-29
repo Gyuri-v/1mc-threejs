@@ -67,13 +67,14 @@ export default function example() {
   // 그리기
   const clock = new THREE.Clock();
   function draw() {
-    const time = clock.getElapsedTime();
+    // const time = clock.getElapsedTime(); // 실행시점부터 총 경과 시간등을 가져옴
+    const delta = clock.getDelta(); // draw()가 실행될때마다의 시간 차를 가져옴
     
     // 각도는 Radian 을 이용
     // 360도는 2파이
-    mesh.rotation.y = time * 1.5;  
+    mesh.rotation.y += delta * 1.5;  
     // mesh.rotation.y += THREE.MathUtils.degToRad(1); // degToRad = deg값을 라디안으로 변경
-    mesh.position.y += time;
+    mesh.position.y += delta;
     if ( mesh.position.y > 3 ){
       mesh.position.y = 0;
     }

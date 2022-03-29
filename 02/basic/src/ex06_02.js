@@ -34,23 +34,6 @@ export default function example() {
   // camera.position.y = 2; 
   camera.position.z = 5; 
 
-  // 직교카메라 orthographic camera
-  // const camera = new THREE.OrthographicCamera(
-  //   -(window.innerWidth / window.innerHeight), // left
-  //   window.innerWidth / window.innerHeight, // right
-  //   1, // top
-  //   -1, // bottom
-  //   0.1, // near
-  //   1000 // far
-  // );
-  // camera.position.x = 1;
-  // camera.position.y = 2;
-  // camera.position.z = 5;
-  // camera.lookAt(0, 0, 0); // 카메라가 포지션쪽(0, 0, 0)을 바라보도록
-  // camera.zoom = 0.5; // 1이 기본값  --> z 는 뷰 각도에 영향을 주는거고, 줌아웃효과를 원하면 orthographic 에서는 꼭 zoom 으로 사용
-  // camera.updateProjectionMatrix(); // zoom 하면 update를 해줘야함
-  // scene.add(camera);
-
   const light = new THREE.DirectionalLight(0xffffff, 1); // DirectionalLight : 태양빛과 비슷함. 위에서 비춰줌  (색, 빛의 강도)
   light.position.x = 3;
   light.position.z = 2;
@@ -65,25 +48,22 @@ export default function example() {
   scene.add(mesh); // scene 에 올림  -> renderer 해줘야 눈에 보임
 
   // 그리기
-  const clock = new THREE.Clock();
+  let oldTime = Date.now();
+
   function draw() {
-    const time = clock.getElapsedTime();
-    
+    const newTime = Date.now();
+    const deltaTime = newTime - oldTime;
+    oldTime = newTime;
     // 각도는 Radian 을 이용
     // 360도는 2파이
-    mesh.rotation.y = time * 1.5;  
+    mesh.rotation.y += deltaTime * 0.001;  
     // mesh.rotation.y += THREE.MathUtils.degToRad(1); // degToRad = deg값을 라디안으로 변경
-    mesh.position.y += time;
+    // mesh.position.y += delta;
     if ( mesh.position.y > 3 ){
       mesh.position.y = 0;
     }
     renderer.render(scene, camera);
-
-    // window.requestAnimationFrame(draw);
     renderer.setAnimationLoop(draw); 
-    // requestAnimationFrame 대신에 사용할 수 있는 three.js 의 renderer에 저장되어 있는 문법. 
-    // 내부에서 requestAnimationFrame을 실행함 
-    // requestAnimationFrame 을 사용해도 되지만 ar, vr 콘텐츠를 만들때는 setAnimationLoop 을 꼭 사용해야함
   }
   draw();
 
