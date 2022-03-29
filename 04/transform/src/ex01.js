@@ -60,6 +60,14 @@ export default function example() {
 	function draw() {
 		const delta = clock.getDelta();
 
+		// position의 set 메서드를 활용해서 이동 가능
+		mesh.position.set(1, 2, 0); // x, y, z
+
+		// position 이란 무엇인가? -> 
+		// Vector3 : 3차원 공간에서 어떤 점을 나타내는 객체(x, y, z)
+		// console.log(mesh.position.length()) // 원점부터 Vector3(mesh) 의 길이
+		console.log(mesh.position.distanceTo(new THREE.Vector3(1, 1, 2))) // Vector3(mesh)부터 어떤 다른 벡터3d 까지의 거리
+
 		renderer.render(scene, camera);
 		renderer.setAnimationLoop(draw);
 	}
