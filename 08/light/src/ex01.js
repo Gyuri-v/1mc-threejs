@@ -29,18 +29,38 @@ export default function example() {
 	scene.add(camera);
 
 	// Light
+	const ambientLight = new THREE.AmbientLight("white", 0.5); // 색, 강도(defalut 1) 전체적으로 은은하게 깔아줌 / 보통 기본으로 세팅하고 다른 조명 추가로 넣어서 많이 사용함
+	const light = new THREE.DirectionalLight('white', 0.5);
+	light.position.y = 3;
+	scene.add(ambientLight, light);
+
+	const lightHelper = new THREE.DirectionalLightHelper(light);
+	scene.add(lightHelper);
 	
 
 	// Controls
 	const controls = new OrbitControls(camera, renderer.domElement);
 
+	// Geometry
+	const planeGeometry = new THREE.PlaneGeometry(10, 10); // 바닥 평면
+	const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+	const sphereGeometry = new THREE.SphereGeometry(0.7, 16, 16);
+
+	// Material
+	const material1 = new THREE.MeshStandardMaterial({ color: 'white' });
+	const material2 = new THREE.MeshStandardMaterial({ color: 'royalblue' });
+	const material3 = new THREE.MeshStandardMaterial({ color: 'gold' });
+
 	// Mesh
-	const geometry = new THREE.BoxGeometry(1, 1, 1);
-	const material = new THREE.MeshStandardMaterial({
-		color: 'seagreen'
-	});
-	const mesh = new THREE.Mesh(geometry, material);
-	scene.add(mesh);
+	const plane = new THREE.Mesh(planeGeometry, material1);
+	const box = new THREE.Mesh(boxGeometry, material2);
+	const sphere = new THREE.Mesh(sphereGeometry, material3);
+
+	plane.rotation.x = THREE.MathUtils.degToRad(-90);
+	box.position.set(1, 1, 0);
+	sphere.position.set(-1, 1, 0);
+
+	scene.add(plane, box, sphere);
 
 	// AxesHelper
 	const axesHelper = new THREE.AxesHelper(3);
@@ -51,6 +71,9 @@ export default function example() {
 	gui.add(camera.position, 'x', -5, 5, 0.1).name('카메라 X');
 	gui.add(camera.position, 'y', -5, 5, 0.1).name('카메라 Y');
 	gui.add(camera.position, 'z', 2, 10, 0.1).name('카메라 Z');
+	gui.add(light.position, 'x', -5, 5).name('라이트 X');
+	gui.add(light.position, 'y', -5, 5).name('라이트 Y');
+	gui.add(light.position, 'z', -5, 5).name('라이트 Z');
 
 	// 그리기
 	const clock = new THREE.Clock();
