@@ -131,24 +131,53 @@ export default function example() {
     renderer.render(scene, camera);
   }
 
+  const sound = new Audio('/sounds/boing.mp3');
+
+  function collide(e) {
+    const velocity = e.contact.getImpactVelocityAlongNormal(); // 속도 호출
+
+    if (velocity > 3) {
+      // 여러개 한꺼번에 했을때 소리는 한번 전체 플레이 되고, 새로 플레이가 되기때문에 소리가 조금 이상하게 남
+      sound.currentTime = 0; // 충돌이 될때마다 시간을 0으로 맞쳐줌
+      sound.play();
+    }
+  }
+
   // 이벤트
   window.addEventListener('resize', setSize);
   canvas.addEventListener('click', () => {
-    spheres.push(
-      new MySphere({
-        scene, // == scene : scene; 네임과 속성이 같으면 하나만 써줘도 된다.
-        cannonWorld,
-        geometry: sphereGeometry,
-        material: sphereMaterial,
-        x: (Math.random() - 0.5) * 2,
-        y: Math.random() * 5 + 2, // 2를 더해서 최소값 설정
-        z: (Math.random() - 0.5) * 2,
-        scale: Math.random() + 0.2,
-      })
-    );
+    const mySphere = new MySphere({
+      scene,
+      cannonWorld,
+      geometry: sphereGeometry,
+      material: sphereMaterial,
+      x: (Math.random() - 0.5) * 2,
+      y: Math.random() * 5 + 2,
+      z: (Math.random() - 0.5) * 2,
+      scale: Math.random() + 0.2,
+    });
+
+    spheres.push(mySphere);
+
+    mySphere.cannonBody.addEventListener('collide', collide);
   });
 
   const preventDragClick = new PreventDragClick(canvas);
+
+  // 삭제하기
+  const btn = document.createElement('button');
+  btn.style.cssText =
+    'position: absolute; left: 20px; top: 20px; font-size: 20px;';
+  btn.innerText = '삭제';
+  document.body.append(btn);
+
+  btn.addEventListener('click', () => {
+    spheres.forEach((item) => {
+      item.cannonBody.removeEventListener('colide', collide);
+      cannonWorld.removeBody(item.cannonBody);
+      scene.remove(item.mesh);
+    });
+  });
 
   draw();
 }
