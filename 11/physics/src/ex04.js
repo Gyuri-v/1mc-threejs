@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as CANNON from 'cannon-es';
 import { PreventDragClick } from './preventDragClick';
+import { MySphere } from './MySphere';
 
 // ----- 주제: cannon.js 기본 세팅
 
@@ -82,15 +83,6 @@ export default function example() {
   );
   cannonWorld.addBody(floorBody);
 
-  const sphereShape = new CANNON.Sphere(0.5); // 반지름
-  const spehereBody = new CANNON.Body({
-    mass: 1,
-    position: new CANNON.Vec3(0, 10, 0),
-    shape: sphereShape,
-    material: defaultMaterial,
-  });
-  cannonWorld.addBody(spehereBody);
-
   // Mesh
   const floorMesh = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
@@ -102,14 +94,11 @@ export default function example() {
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
 
+  const spheres = [];
   const sphereGeometry = new THREE.SphereGeometry(0.5);
   const sphereMaterial = new THREE.MeshStandardMaterial({
     color: 'seagreen',
   });
-  const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-  sphereMesh.position.y = 0.5;
-  sphereMesh.castShadow = true;
-  scene.add(sphereMesh);
 
   // 그리기
   const clock = new THREE.Clock();
@@ -121,16 +110,11 @@ export default function example() {
     if (delta < 0.01) cannonStepTime = 1 / 120;
 
     cannonWorld.step(cannonStepTime, delta, 3);
-    sphereMesh.position.copy(spehereBody.position); // 위치
-    sphereMesh.quaternion.copy(spehereBody.quaternion); // 회전
 
-    // 속도 감속
-    spehereBody.velocity.x *= 0.98;
-    spehereBody.velocity.y *= 0.98;
-    spehereBody.velocity.z *= 0.98;
-    spehereBody.angularVelocity.x *= 0.98;
-    spehereBody.angularVelocity.y *= 0.98;
-    spehereBody.angularVelocity.z *= 0.98;
+    spheres.forEach((item) => {
+      item.mesh.position.copy(item.cannonBody.position);
+      item.mesh.quaternion.copy(item.cannonBody.quaternion);
+    });
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);
@@ -146,16 +130,18 @@ export default function example() {
   // 이벤트
   window.addEventListener('resize', setSize);
   canvas.addEventListener('click', () => {
-    if (preventDragClick.mouseMoved) return;
-
-    // 속도를 0으롤 해줘서 클릭 여러번해도 누적되지 않도록
-    spehereBody.velocity.x = 0;
-    spehereBody.velocity.y = 0;
-    spehereBody.velocity.z = 0;
-    spehereBody.angularVelocity.x = 0;
-    spehereBody.angularVelocity.y = 0;
-    spehereBody.angularVelocity.z = 0;
-    spehereBody.applyForce(new CANNON.Vec3(-300, 0, 0), spehereBody.position); // 힘을 vec3 형태로(x: -100이면 x 왼쪽으로 -100만큼의 힘이 작동), 힘을 어디에 적용할건지(sphere에 적용할거면 sphereBody의 position으로)
+    spheres.push(
+      new MySphere({
+        scene, // == scene : scene; 네임과 속성이 같으면 하나만 써줘도 된다.
+        cannonWorld,
+        geometry: sphereGeometry,
+        material: sphereMaterial,
+        x: (Math.random() - 0.5) * 2,
+        y: Math.random() * 5 + 2, // 2를 더해서 최소값 설정
+        z: (Math.random() - 0.5) * 2,
+        scale: Math.random() + 0.2,
+      })
+    );
   });
 
   const preventDragClick = new PreventDragClick(canvas);
