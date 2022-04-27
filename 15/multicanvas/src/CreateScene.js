@@ -25,6 +25,8 @@ export class CreateScene {
     this.camera.position.z = cameraPosition.z;
 
     this.scene.add(this.camera);
+
+    this.meshes = [];
   }
 
   set(func) {
@@ -44,6 +46,16 @@ export class CreateScene {
       return;
     }
 
+    this.camera.aspect = rect.width / rect.height;
+    this.camera.updateProjectionMatrix();
+
     // secScissor : canvas 의 영역을 가위로 오려낸거처럼 잘라내서 렌더링 되도록 할 수 있음
+    // y 는 영역의 바닥위치로 해야함
+    const canvasBottom = renderer.domElement.clientHeight - rect.bottom;
+    renderer.setScissor(rect.left, canvasBottom, rect.width, rect.height);
+    renderer.setViewport(rect.left, canvasBottom, rect.width, rect.height);
+    renderer.setScissorTest(true);
+
+    renderer.render(this.scene, this.camera);
   }
 }
