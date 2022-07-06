@@ -113,7 +113,7 @@ const house = new House({
   modelSrc: '/models/house.glb',
   x: 5,
   y: -1.3,
-  z: 2,
+  z: 3,
 });
 
 const player = new Player({
