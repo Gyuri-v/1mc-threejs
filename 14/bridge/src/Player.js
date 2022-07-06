@@ -10,15 +10,23 @@ export class Player extends Stuff {
     this.height = 0.5;
     this.depth = 0.5;
 
-    this.mesh = new Mesh(
-      new BoxGeometry(this.width, this.height, this.depth),
-      new MeshBasicMaterial({ transparent: true, opacity: 0 })
-    );
-    this.mesh.castShadow = true;
-    this.mesh.position.set(this.x, this.y, this.z);
-    cm1.scene.add(this.mesh);
+    // this.mesh = new Mesh(
+    //   new BoxGeometry(this.width, this.height, this.depth),
+    //   new MeshBasicMaterial({ transparent: true, opacity: 0 })
+    // );
+    // this.mesh.castShadow = true;
+    // this.mesh.position.set(this.x, this.y, this.z);
+    // cm1.scene.add(this.mesh);
 
     cm1.gltfLoader.load('/models/ilbuni.glb', (glb) => {
+      // traverse : forEach 랑 비슷, scene 안의 배열 요소 마다 돌면서 child 로 지정해서 돌려줌
+      glb.scene.traverse((child) => {
+        if (child.isMesh) {
+          // mesh 인지 아닌지
+          child.castShadow = true;
+        }
+      });
+
       this.modelMesh = glb.scene.children[0];
       this.modelMesh.position.set(this.x, this.y, this.z);
       this.modelMesh.rotation.set(
